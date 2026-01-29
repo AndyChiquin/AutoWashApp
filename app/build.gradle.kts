@@ -63,6 +63,9 @@ dependencies {
 
 // Firebase Firestore (Base de datos)
     implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
+    implementation("androidx.compose.material:material-icons-extended")
+
+
 
 
 }

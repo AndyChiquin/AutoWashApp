@@ -1,4 +1,4 @@
-package com.example.autowash.ui.login
+package com.example.autowash.ui.home.provider
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -6,24 +6,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun LoginScreen(
-    onLoginClick: (String, String) -> Unit,
-    onGoToRegister: () -> Unit
+fun ProviderHomeScreen(
+    onLogout: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val auth = FirebaseAuth.getInstance()
 
     Box(
         modifier = Modifier
@@ -43,6 +40,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // ICONO PROVEEDOR
                 Box(
                     modifier = Modifier
                         .size(72.dp)
@@ -63,60 +61,35 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Lavado Express",
+                    text = "Panel del Proveedor",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "Servicio de lavado a domicilio",
+                    text = "Gestiona tus servicios y trabajos asignados",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Spacer(modifier = Modifier.height(28.dp))
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Correo electrónico") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Email, null)
-                    },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Contraseña") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Lock, null)
-                    },
-                    visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = { onLoginClick(email, password) },
+                    onClick = {
+                        auth.signOut()
+                        onLogout()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Iniciar sesión")
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                TextButton(onClick = onGoToRegister) {
-                    Text("¿No tienes cuenta? Regístrate")
+                    Icon(
+                        imageVector = Icons.Default.ExitToApp,
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Cerrar sesión")
                 }
             }
         }
