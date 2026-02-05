@@ -2,15 +2,34 @@ package com.example.autowash.ui.register
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +52,11 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+
+
 
     Box(
         modifier = Modifier
@@ -83,6 +107,57 @@ fun RegisterScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                OutlinedTextField(
+                    value = firstName,
+                    onValueChange = { newValue ->
+                        if (
+                            newValue.length <= 20 &&
+                            newValue.all { it.isLetter() || it.isWhitespace() }
+                        ) {
+                            firstName = newValue
+                        }
+                    },
+                    label = { Text("Nombre") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = lastName,
+                    onValueChange = { newValue ->
+                        if (
+                            newValue.length <= 20 &&
+                            newValue.all { it.isLetter() || it.isWhitespace() }
+                        ) {
+                            lastName = newValue
+                        }
+                    },
+                    label = { Text("Apellido") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() } && newValue.length <= 10) {
+                            phone = newValue
+                        }
+                    },
+                    label = { Text("Teléfono") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
 
                 Spacer(modifier = Modifier.height(28.dp))
 
@@ -138,18 +213,48 @@ fun RegisterScreen(
                         val cleanPassword = password.trim()
                         val cleanConfirm = confirmPassword.trim()
 
-                        if (cleanEmail.isEmpty() || cleanPassword.isEmpty()) {
-                            Toast.makeText(context, "Campos vacíos", Toast.LENGTH_SHORT).show()
+                        if (firstName.length < 2 || firstName.length > 20) {
+                            Toast.makeText(context, "Nombre no válido", Toast.LENGTH_SHORT).show()
                             return@Button
                         }
 
+                        if (lastName.length < 2 || lastName.length > 20) {
+                            Toast.makeText(context, "Apellido no válido", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+
+                        if (phone.length != 10) {
+                            Toast.makeText(
+                                context,
+                                "El teléfono debe tener 10 dígitos",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@Button
+                        }
+
+                        if (cleanEmail.isEmpty() || cleanPassword.isEmpty()) {
+                            Toast.makeText(
+                                context,
+                                "Correo y contraseña requeridos",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@Button
+                        }
+
+
+
                         if (cleanPassword.length < 6) {
-                            Toast.makeText(context, "Mínimo 6 caracteres", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Mínimo 6 caracteres", Toast.LENGTH_SHORT)
+                                .show()
                             return@Button
                         }
 
                         if (cleanPassword != cleanConfirm) {
-                            Toast.makeText(context, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Las contraseñas no coinciden",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@Button
                         }
 
@@ -163,11 +268,16 @@ fun RegisterScreen(
                                         ?: return@addOnCompleteListener
 
                                     val userData = hashMapOf(
+                                        "firstName" to firstName.trim(),
+                                        "lastName" to lastName.trim(),
+                                        "phone" to phone.trim(),
                                         "email" to cleanEmail,
                                         "role" to "USER",
                                         "active" to true,
                                         "createdAt" to System.currentTimeMillis()
                                     )
+
+
 
                                     db.collection("users")
                                         .document(uid)
