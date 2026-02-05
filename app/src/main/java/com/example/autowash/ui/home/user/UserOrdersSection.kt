@@ -32,7 +32,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun UserOrdersSection(
-    onSelectPaymentMethod: (Map<String, Any>) -> Unit
+    onSelectPaymentMethod: (Map<String, Any>) -> Unit,
+    onStatsCalculated: (
+        totalOrders: Int,
+        paidOrders: Int,
+        pendingPayments: Int
+    ) -> Unit = { _, _, _ -> }
 ) {
 
 
@@ -50,11 +55,32 @@ fun UserOrdersSection(
             .whereEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { result ->
-                orders = result.documents.map { doc ->
+                val loadedOrders = result.documents.map { doc ->
                     val data = doc.data ?: emptyMap()
                     data + mapOf("orderId" to doc.id)
                 }
+
+                orders = loadedOrders
                 isLoading = false
+
+                // 📊 CALCULAR MÉTRICAS
+                val totalOrders = loadedOrders.size
+
+                val paidOrders = loadedOrders.count {
+                    it["status"] == "PAID"
+                }
+
+                val pendingPayments = loadedOrders.count {
+                    it["status"] == "PAYMENT_METHOD_SELECTED" ||
+                            it["status"] == "PAYMENT_PROOF_SUBMITTED"
+                }
+
+                // 🔁 ENVIAR MÉTRICAS AL HOME
+                onStatsCalculated(
+                    totalOrders,
+                    paidOrders,
+                    pendingPayments
+                )
             }
 
             .addOnFailureListener {

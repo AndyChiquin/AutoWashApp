@@ -22,8 +22,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -157,12 +157,39 @@ fun ProviderHomeScreen(
                 .fillMaxSize()
         ) {
 
-            TabRow(selectedTabIndex = selectedTab) {
-                Tab(selectedTab == 0, { selectedTab = 0 }) { Text("Mis Servicios") }
-                Tab(selectedTab == 1, { selectedTab = 1 }) { Text("Reservas") }
-                Tab(selectedTab == 2, { selectedTab = 2 }) { Text("Pagos") }
-                Tab(selectedTab == 3, { selectedTab = 3 }) { Text("Perfil") }
+            ScrollableTabRow(
+                selectedTabIndex = selectedTab,
+                edgePadding = 16.dp,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = { Text("Mis Servicios") }
+                )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = { Text("Reservas") }
+                )
+                Tab(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    text = { Text("Pagos") }
+                )
+                Tab(
+                    selected = selectedTab == 3,
+                    onClick = { selectedTab = 3 },
+                    text = { Text("Perfil") }
+                )
+                Tab(
+                    selected = selectedTab == 4,
+                    onClick = { selectedTab = 4 },
+                    text = { Text("Estadísticas") }
+                )
             }
+
 
 
             when (selectedTab) {
@@ -228,6 +255,11 @@ fun ProviderHomeScreen(
                     // Perfil
                     ProviderProfileScreen()
                 }
+
+                4 -> {
+                    ProviderStatsScreen()
+                }
+
             }
 
         }

@@ -14,8 +14,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserHomeScreen(
@@ -45,10 +46,17 @@ fun UserHomeScreen(
     var fullName by remember { mutableStateOf("Usuario") }
     var role by remember { mutableStateOf("Cliente") }
 
+    // 📊 MÉTRICAS DEL USUARIO
+    var totalOrders by remember { mutableStateOf(0) }
+    var paidOrders by remember { mutableStateOf(0) }
+    var pendingPayments by remember { mutableStateOf(0) }
+
+
     // 🔹 ORDEN SELECCIONADA PARA PAGO
     var selectedOrderForPayment by remember {
         mutableStateOf<Map<String, Any>?>(null)
     }
+
 
     // 🔹 Cargar datos del usuario
     LaunchedEffect(Unit) {
@@ -123,8 +131,10 @@ fun UserHomeScreen(
 
         Column(modifier = Modifier.padding(padding)) {
 
-            // 🔹 TABS
-            TabRow(selectedTabIndex = selectedTab) {
+            ScrollableTabRow(
+                selectedTabIndex = selectedTab,
+                edgePadding = 16.dp
+            ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
@@ -145,7 +155,13 @@ fun UserHomeScreen(
                     onClick = { selectedTab = 3 },
                     text = { Text("Métodos de Pago") }
                 )
+                Tab(
+                    selected = selectedTab == 4,
+                    onClick = { selectedTab = 4 },
+                    text = { Text("Estadísticas") }
+                )
             }
+
 
             // 🔹 CONTENIDO
             Column(modifier = Modifier.padding(16.dp)) {
@@ -158,9 +174,15 @@ fun UserHomeScreen(
                     1 -> UserOrdersSection(
                         onSelectPaymentMethod = { order ->
                             selectedOrderForPayment = order
-                            selectedTab = 3 // 👉 redirige a Métodos de Pago
+                            selectedTab = 3
+                        },
+                        onStatsCalculated = { total, paid, pending ->
+                            totalOrders = total
+                            paidOrders = paid
+                            pendingPayments = pending
                         }
                     )
+
 
                     // 👤 PERFIL
                     2 -> ProfileScreen()
@@ -183,6 +205,10 @@ fun UserHomeScreen(
                             )
                         }
                     }
+
+                    // 📊 ESTADÍSTICAS
+                    4 -> UserStatsScreen()
+
                 }
             }
         }
